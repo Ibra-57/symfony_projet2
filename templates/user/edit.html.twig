@@ -1,0 +1,55 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block page_title %}Modifier l'utilisateur{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Modifier l'utilisateur</h3>
+            <p class="text-sm text-gray-600 mt-1">Modifiez les informations de l'utilisateur</p>
+        </div>
+
+        {{ form_start(form) }}
+            <div class="space-y-6">
+                <div>
+                    {{ form_label(form.email, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-2'}}) }}
+                    {{ form_widget(form.email) }}
+                    {{ form_errors(form.email) }}
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        {{ form_label(form.firstname, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-2'}}) }}
+                        {{ form_widget(form.firstname) }}
+                        {{ form_errors(form.firstname) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.lastname, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-2'}}) }}
+                        {{ form_widget(form.lastname) }}
+                        {{ form_errors(form.lastname) }}
+                    </div>
+                </div>
+
+                <div>
+                    {{ form_label(form.roles, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-2'}}) }}
+                    <div class="space-y-2">
+                        {{ form_widget(form.roles) }}
+                    </div>
+                    {{ form_errors(form.roles) }}
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t border-gray-200">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        Enregistrer
+                    </button>
+                    <a href="{{ path('app_user_index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                        Annuler
+                    </a>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
