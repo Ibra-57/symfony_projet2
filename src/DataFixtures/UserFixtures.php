@@ -42,6 +42,38 @@ class UserFixtures extends Fixture
         $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
         $manager->persist($user);
 
+        $user2 = new User();
+        $user2->setEmail('sophie.martin@example.com');
+        $user2->setFirstname('Sophie');
+        $user2->setLastname('Martin');
+        $user2->setRoles(['ROLE_USER']);
+        $user2->setPassword($this->passwordHasher->hashPassword($user2, 'password'));
+        $manager->persist($user2);
+
+        $user3 = new User();
+        $user3->setEmail('pierre.dubois@example.com');
+        $user3->setFirstname('Pierre');
+        $user3->setLastname('Dubois');
+        $user3->setRoles(['ROLE_MANAGER']);
+        $user3->setPassword($this->passwordHasher->hashPassword($user3, 'password'));
+        $manager->persist($user3);
+
+        $user4 = new User();
+        $user4->setEmail('marie.bernard@example.com');
+        $user4->setFirstname('Marie');
+        $user4->setLastname('Bernard');
+        $user4->setRoles(['ROLE_USER']);
+        $user4->setPassword($this->passwordHasher->hashPassword($user4, 'password'));
+        $manager->persist($user4);
+
+        $user5 = new User();
+        $user5->setEmail('lucas.petit@example.com');
+        $user5->setFirstname('Lucas');
+        $user5->setLastname('Petit');
+        $user5->setRoles(['ROLE_USER']);
+        $user5->setPassword($this->passwordHasher->hashPassword($user5, 'password'));
+        $manager->persist($user5);
+
         $manager->flush();
     }
 }
