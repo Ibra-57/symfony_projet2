@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\ProductRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,8 +13,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractController
 {
     #[Route('/', name: 'app_dashboard')]
-    public function index(): Response
+    public function index(UserRepository $userRepository, ProductRepository $productRepository): Response
     {
-        return $this->render('dashboard/index.html.twig');
+        return $this->render('dashboard/index.html.twig', [
+            'userCount' => $userRepository->count([]),
+            'productCount' => $productRepository->count([]),
+        ]);
     }
 }

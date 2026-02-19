@@ -1,0 +1,104 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block page_title %}Gestion des produits{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-900">Liste des produits</h3>
+        <div class="flex gap-2">
+            <a href="{{ path('app_product_export') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Exporter CSV
+            </a>
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_product_new') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Ajouter un produit
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <a href="{{ path('app_product_index', {sort: 'name', direction: sort == 'name' and direction == 'ASC' ? 'DESC' : 'ASC'}) }}" class="hover:text-gray-900 flex items-center gap-1">
+                            Nom
+                            {% if sort == 'name' %}<span>{{ direction == 'ASC' ? '↑' : '↓' }}</span>{% endif %}
+                        </a>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <a href="{{ path('app_product_index', {sort: 'type', direction: sort == 'type' and direction == 'ASC' ? 'DESC' : 'ASC'}) }}" class="hover:text-gray-900 flex items-center gap-1">
+                            Type
+                            {% if sort == 'type' %}<span>{{ direction == 'ASC' ? '↑' : '↓' }}</span>{% endif %}
+                        </a>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <a href="{{ path('app_product_index', {sort: 'price', direction: sort == 'price' and direction == 'ASC' ? 'DESC' : 'ASC'}) }}" class="hover:text-gray-900 flex items-center gap-1">
+                            Prix
+                            {% if sort == 'price' %}<span>{{ direction == 'ASC' ? '↑' : '↓' }}</span>{% endif %}
+                        </a>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <a href="{{ path('app_product_index', {sort: 'stock', direction: sort == 'stock' and direction == 'ASC' ? 'DESC' : 'ASC'}) }}" class="hover:text-gray-900 flex items-center gap-1">
+                            Stock/Licence
+                            {% if sort == 'stock' %}<span>{{ direction == 'ASC' ? '↑' : '↓' }}</span>{% endif %}
+                        </a>
+                    </th>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for product in products %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
+                        {% if product.description %}
+                            <div class="text-sm text-gray-500">{{ product.description|slice(0, 50) }}...</div>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if product.type == 'physical' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">Physique</span>
+                        {% else %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded bg-purple-100 text-purple-800">Numérique</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ product.price }} €
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {% if product.type == 'physical' %}
+                            Stock: {{ product.stock ?? 'N/A' }}
+                        {% else %}
+                            {{ product.licenseKey|slice(0, 20) }}...
+                        {% endif %}
+                    </td>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <form method="post" action="{{ path('app_product_delete', {id: product.id}) }}" 
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');" 
+                              class="inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">Aucun produit trouvé</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

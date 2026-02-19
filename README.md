@@ -1,65 +1,179 @@
-# Symfony 7.4 Boilerplate 
+# Backoffice — Matériel de Randonnée Haut de Gamme
 
-Attention : Il vous faut PHP >=8.2 pour faire fonctionner ce projet.
+Application Symfony de gestion du backoffice pour une entreprise de matériel de randonnée.
 
-## Initialisation de votre IDE
+## Prérequis
 
-### PHPStorm
+- PHP 8.2+
+- Composer
+- MySQL / MariaDB (serveur local démarré)
+- Node.js (pour Tailwind CSS)
 
-1. Ouvrir le projet dans PHPStorm
-2. Installer les extensions Twig et Symfony
-    - Aller dans File > Settings > Plugins
-    - Installer les extensions (Twig, EA Inspection, PHP Annotations, .env files support)
+---
 
-### Visual Studio Code
+## Installation
 
-1. Ouvrir le projet dans Visual Studio Code
-2. Installer les extensions pour PHP, Twig et Symfony
-    - Aller dans l'onglet Extensions
-    - Installer les extensions (whatwedo.twig, TheNouillet.symfony-vscode, DEVSENSE.phptools-vscode, 
-    bmewburn.vscode-intelephense-client, zobo.php-intellisense)
+### 1. Cloner et installer les dépendances
 
-## Installation avec IDX
+```bash
+composer install
+```
 
-1. Fork le projet sur votre compte GitHub
-2. Importer le projet depuis votre GitHub sur IDX
-3. Le projet est déjà lancé il suffit d'aller dans l'onglet du terminal avec `start` puis cliquer sur le lien `localhost`
-4. Lancer la commande `composer i` pour installer les dépendances du projet.
-5. Pour accéder à la base de données `mysql -u root`
-6. Dans un fichier à la racine `.env.local` mettre cette variable d'environnement 
-`DATABASE_URL="mysql://root:@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4"`
+### 2. Configurer la base de données
 
-## Installation en local
+Créez un fichier `.env.local` à la racine :
 
-1. Cloner le projet
-2. Installer PHP >= 8.2 et Composer (Sur votre machine utiliser XAMPP pour windows, MAMP pour mac ou LAMP pour linux bien prendre la version PHP 8.2)
-3. Installer les dépendances du projet avec la commande `composer install`
-4. Faire un virtual host sur votre serveur local (XAMPP par exemple pour Windows) 
- - Ouvrir le fichier `httpd-vhosts.conf` dans le répertoire `C:\xampp\apache\conf\extra`
-    - Ajouter le code suivant à la fin du fichier
-    ```
-    <VirtualHost *>
-        DocumentRoot "C:\Users\votre_username\Documents\iut\symfony_base\public"
-        ServerName symfony_base.local
-        
-        <Directory "C:\Users\votre_username\Documents\iut\symfony_base\public">
-            AllowOverride All
-            Require all granted
-        </Directory>
-    </VirtualHost>
-    ```
-    - Ajouter l'adresse IP de votre machine dans le fichier `C:\Windows\System32\drivers\etc\hosts`
-    ```
-    127.0.0.1 symfony_base.local
-    ```
-    - Redémarrer Apache
-    - Accéder à l'adresse `symfony_base.local` dans votre navigateur
+```dotenv
+DATABASE_URL="mysql://root:password@127.0.0.1:3306/app2?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
+```
 
-4. Créer un fichier `.env.local` à la racine du projet et ajouter la configuration de la base de données
-5. Créer la base de données avec la commande `php bin/console doctrine:database:create`
+Adaptez les valeurs `root`, `password`, `app2` selon votre configuration locale.
 
-## Utilisation
+### 3. Créer la base de données et exécuter les migrations
 
-- N'hésitez pas à consulter la documentation de Symfony pour plus d'informations sur l'utilisation du framework : https://symfony.com/doc/current/index.html
+```bash
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+```
 
-- Notez comment fonctionne votre projet dans le fichier README.md et mettez à jour ce fichier au fur et à mesure de l'avancement de votre projet pour aider les autres développeurs à comprendre comment fonctionne votre projet.
+### 4. Charger les données de test (fixtures)
+
+```bash
+php bin/console doctrine:fixtures:load
+```
+
+Cela crée **7 utilisateurs** et **8 produits** de test.
+
+### 5. Compiler les assets Tailwind CSS
+
+```bash
+php bin/console tailwind:build
+copy var\tailwind\app.built.css public\css\app.css
+```
+
+### 6. Lancer le serveur de développement
+
+```bash
+symfony server:start
+```
+
+Accédez à [http://localhost:8000](http://localhost:8000).
+
+---
+
+## Rôles disponibles
+
+| Rôle | Accès |
+|------|-------|
+| `ROLE_ADMIN` | Tableau de bord, Produits, Clients, Utilisateurs (CRUD complet) |
+| `ROLE_MANAGER` | Tableau de bord, Produits (lecture), Clients (CRUD sans suppression) |
+| `ROLE_USER` | Tableau de bord, Produits (lecture seule) |
+
+### Comptes de test (après fixtures)
+
+| Email | Mot de passe | Rôle |
+|-------|-------------|------|
+| `admin@example.com` | `password` | ROLE_ADMIN |
+| `manager@example.com` | `password` | ROLE_MANAGER |
+| `user@example.com` | `password` | ROLE_USER |
+
+---
+
+## Commandes disponibles
+
+### Importer des produits depuis un CSV
+
+Placez votre fichier CSV dans `/public` puis exécutez :
+
+```bash
+php bin/console app:import-products produits.csv
+```
+
+**Format CSV attendu** (séparateur `;`) :
+
+```csv
+Nom;Type;Description;Prix;Poids;Stock;Clé de licence
+Sac Pro 50L;physical;Sac robuste;199.99;1.5;30;
+Guide PDF TMB;digital;Guide Tour du Mont Blanc;29.99;;;KEY-TMB-2024
+```
+
+- `Type` : `physical` ou `digital`
+- `Poids` et `Stock` : requis pour les produits physiques
+- `Clé de licence` : requise pour les produits numériques
+
+---
+
+### Créer un client interactivement
+
+```bash
+php bin/console app:create-client
+```
+
+La commande demandera successivement :
+1. Prénom
+2. Nom
+3. Email (valide et unique)
+4. Téléphone (optionnel)
+5. Adresse (optionnel)
+6. Confirmation avant enregistrement
+
+---
+
+## Lancer les tests
+
+```bash
+php bin/phpunit
+```
+
+Tests disponibles :
+- **`CsvExportServiceTest`** — Test unitaire du service d'export CSV (mocks repository)
+- **`UserCreationTest`** — Tests fonctionnels : création utilisateur avec mock EntityManager, unicité email, attribution des rôles
+
+---
+
+## Structure du projet
+
+```
+src/
+├── Command/
+│   ├── ImportProductsCommand.php   # Import CSV produits
+│   └── CreateClientCommand.php     # Création client interactive
+├── Controller/
+│   ├── DashboardController.php
+│   ├── ProductController.php
+│   ├── ClientController.php
+│   ├── UserController.php
+│   └── SecurityController.php
+├── Entity/
+│   ├── User.php
+│   ├── Product.php
+│   └── Client.php
+├── Form/
+│   ├── UserType.php
+│   ├── ClientType.php
+│   └── ProductFlow/               # Formulaire multi-étapes produit
+├── Security/Voter/
+│   ├── UserVoter.php
+│   ├── ProductVoter.php
+│   └── ClientVoter.php
+└── Service/
+    └── CsvExportService.php
+tests/
+├── Service/
+│   └── CsvExportServiceTest.php
+└── Controller/
+    └── UserCreationTest.php
+```
+
+---
+
+## Formulaire multi-étapes produit (Craue FormFlow)
+
+La création de produit suit 5 étapes :
+
+1. **Type de produit** — Physique ou Numérique
+2. **Détails** — Nom, Description, Prix
+3. **Logistique** *(physique uniquement)* — Poids, Stock
+4. **Licence** *(numérique uniquement)* — Clé d'accès
+5. **Confirmation** *(si prix > 500€)* — Checkbox de validation
+6. **Récapitulatif** — Aperçu avant validation

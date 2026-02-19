@@ -15,13 +15,10 @@ class FormFlowController extends AbstractController
     #[Route('/formflow', name: 'form_flow_demo')]
     public function __invoke(Request $request): Response
     {
-        /** @var FormFlowInterface $flow */
         $flow = $this->createForm(BasicType::class, new BasicDto())
             ->handleRequest($request);
 
         if ($flow->isSubmitted() && $flow->isValid() && $flow->isFinished()) {
-            // do something with $flow->getData();
-
             $this->addFlash('success', 'Your form flow was successfully finished!');
 
             return $this->redirectToRoute('form_flow_demo');
